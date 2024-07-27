@@ -29,16 +29,62 @@ def plot_autocorrelation(frame, y_hat):
     plt.show()
 
 
-def plot_corrected(s, sr=16000):
+def plot_corrected(s, sr=32000):
     S = librosa.amplitude_to_db(np.abs(s), ref=np.max)
     fig = plt.figure()
     img = librosa.display.specshow(
-        S, x_axis='time', y_axis='log', sr=sr, hop_length=512, n_fft=1024)
+        S, x_axis='time', y_axis='log', sr=sr)
     plt.title("Corrected Spectrogram")
 
     fig.colorbar(img, format="%+2.f dB")
 
     plt.show()
+
+
+def process_no_frame(path):  # no frame division
+    audio, sr = librosa.load(
+        path, sr=32000)
+
+    centroid = librosa.feature.spectral_centroid(
+        y=audio, sr=sr, n_fft=1024, win_length=1024, hop_length=512)
+    # plot_centroid(centroid, frame)
+
+    # Perform Formant Analysis
+    p = round(16000/1000)+2
+    lpc_coeff = librosa.lpc(y=audio, order=p)
+
+    # Autocorrelation to remove erroneous signals
+    b = np.hstack([[0], -1*lpc_coeff[1:]])
+    y_hat = scipy.signal.lfilter(b, [1], audio)
+
+    plot_autocorrelation(frame=audio, y_hat=y_hat)
+
+    # find spectral features in the F1 Domain
+    # y_hat = librosa.decompose.nn_filter(S=y_hat, aggregate=np.average)
+    s, phase = librosa.magphase(librosa.stft(
+        y_hat))
+
+    plot_corrected(s)
+
+    # find peaks
+    peaks = peak_finding(s)
+
+    # sort peaks with respect to time
+    peaks_sorted = np.array(sorted(peaks, key=lambda x: x[0]))
+
+    # boundary detection
+    prev_x = 0
+    prev_y = 0
+    S = librosa.amplitude_to_db(np.abs(s), ref=np.max)
+    for (x, y, I) in peaks_sorted:
+        x = int(x)
+        y = int(y)
+
+        region = S[prev_x:x+1, prev_y:y+1]
+        region = np.matrix.flatten(region)
+
+        prev_x = x
+        prev_y = y
 
 
 def process(path):
@@ -65,16 +111,25 @@ def process(path):
         plot_autocorrelation(frame=frame, y_hat=y_hat)
 
         # find spectral features in the F1 Domain
-        y_hat = librosa.decompose.nn_filter(S=y_hat, aggregate=np.average)
+       # y_hat = librosa.decompose.nn_filter(S=y_hat, aggregate=np.average)
         s, phase = librosa.magphase(librosa.stft(
-            y_hat, n_fft=1024, hop_length=512))
+            y_hat, n_fft=200, hop_length=100))
 
         plot_corrected(s)
 
         # find peaks
         peaks = peak_finding(s)
-        print(peaks)
+
+        # sort peaks with respect to time
+        peaks_sorted = sorted(peaks, key=lambda x: x[0])
+
+        # boundary detection
+        for (x, y, I) in peaks_sorted:
+            region = s[:x, :y, I]
+            region = np.matrix.flatten(region)
+            print(region)
 
 
 if __name__ == '__main__':
-    process("/Volumes/Vault/Smudge/Datasets/Tamil/Wav-Audios/1audio.wav")
+    process_no_frame(
+        "/Volumes/Vault/Smudge/Datasets/Tamil/Wav-Audios/1audio.wav")

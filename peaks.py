@@ -38,6 +38,6 @@ def peak_finding(s):
 
     peaks = [(x, y, spectrogram[y, x]) for y, x in peak_positions]
 
-    # plot_peaks(peaks)
+    plot_peaks(peaks)
 
     return peaks
