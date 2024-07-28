@@ -37,3 +37,5 @@ Prototype Solution of transcription of  Tamil speech to phonetic sounds in the T
 |```tamil_phonetic.json```|Mapping of Tamil characters to its corresponding audo files|
 
 ## Collaborators
+| [<img src="https://github.com/Kriticle.png?size=50" width="50"/>](https://github.com/Kriticle)| [<img src="https://github.com/VaishnaviDixit14.png?size=50" width="50"/>](https://github.com/VaishnaviDixit14) | [<img src="https://github.com/DARKSNOUT.png?size=50" width="50"/>](https://github.com/DARKSNOUT) | [<img src="https://github.com/Deceptrax123.png?size=50" width="50"/>](https://github.com/Deceptrax123) |
+| -------- | -------- | -------- | -------- |
