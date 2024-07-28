@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 from peaks import peak_finding
-from phonetic_spectrogram import compute_spectrogram_and_find_peaks
+from phonetic_spectrogram import compute_spectrogram_and_find_peaks, remove_silence
 import math
 import os
 from dotenv import load_dotenv
@@ -54,7 +54,7 @@ def process_no_frame(path):  # no frame division
     # plot_centroid(centroid, frame)
 
     # Perform Formant Analysis
-    p = round(16000/1000)+2
+    p = round(32000/1000)+2
     lpc_coeff = librosa.lpc(y=audio, order=p)
 
     # Autocorrelation to remove erroneous signals
@@ -84,6 +84,7 @@ def process_no_frame(path):  # no frame division
     with open('tamil_phonetic.json') as f:
         tamil_phonetics = json.load(f)
 
+    graphemes = list()
     for (x, y, I) in peaks_sorted:
         x = int(x)
         y = int(y)
@@ -94,6 +95,7 @@ def process_no_frame(path):  # no frame division
         # compute spectrogram for phonetics
         distances = list()
         keys = list()
+
         for key in tamil_phonetics.keys():
             file_name = tamil_phonetics[key][1]
             path = os.path.join(os.getenv("phonetics"), file_name+"audio.m4a")
@@ -110,11 +112,16 @@ def process_no_frame(path):  # no frame division
 
         minpos = distances.index(min(distances))
         phonetic = keys[minpos-1]
-
-        print(phonetic, end=" ")
+        print(phonetic)
+        graphemes.append(phonetic)
 
         prev_x = x
         prev_y = y
+
+    res = ""
+    for gr in graphemes:
+        res += gr
+    print(res)
 
 
 def process(path):
@@ -162,5 +169,4 @@ def process(path):
 
 if __name__ == '__main__':
     load_dotenv('.env')
-    process_no_frame(
-        "/Volumes/Vault/Smudge/Datasets/Tamil/Wav-Audios/1audio.wav")
+    process_no_frame("110audio.wav")  # random tamil audio.

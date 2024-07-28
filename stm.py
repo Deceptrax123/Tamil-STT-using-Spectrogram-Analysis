@@ -2,9 +2,6 @@ import librosa
 import numpy as np
 import matplotlib.pyplot as plt
 
-# bruh fix the existing scientific write ups on this concept. Its broken.
-# rough code, avoid
-
 
 def mfcc(frames, i, band_index):
     mfcc_stm = librosa.feature.mfcc(
