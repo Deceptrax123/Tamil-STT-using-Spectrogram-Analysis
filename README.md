@@ -1,14 +1,15 @@
 # Tamil Speech to Text using Spectrogram Analysis
-Prototype Solution of transcribing Tamil speech to phonetic sounds in the Tamil language.
+Prototype Solution of transcription of  Tamil speech to phonetic sounds in the Tamil language.
 
 ## Approach to the Problem
-  - Pre-processing of audio using Centroid Estimation for silence removal.
-  - Wave correction through L1 Formant Analysis using a Linear Predictor Method wih an initial parameter p 
-  - Short time fourier transform of the corrected waveform to convert the signals from time to frequency domain
-  - Plotting a spectrogram of the audio signal and finding local and global peaks of the waveform
-  - Average filter is passed into the corrected waveform to account for spurious peaks.
-  - Segment the audio keeping peaks as boundary points and map the spectral signatures of the segmented audio to the nearest spectral features of the Tamil phonetic sound.
-  - Display the phonetic sounds as Tamil characters.
+1. **Silence Removal via Centroid Estimation**: Pre-process the audio signal to remove silence by estimating the centroid.
+2. **Wave Correction through L1 Formant Analysis**: Apply L1 formant analysis using a linear predictor method with an initial parameter \( p \) to correct the waveform.
+3. **Time-Frequency Domain Conversion**: Perform a Short-Time Fourier Transform (STFT) on the corrected waveform to convert the signals from the time domain to the frequency domain.
+4. **Spectrogram Analysis**: Generate a spectrogram of the audio signal and identify both local and global peaks within the waveform.
+5. **Peak Smoothing**: Apply an average filter to the corrected waveform to mitigate spurious peaks.
+6. **Audio Segmentation and Mapping**: Segment the audio signal using identified peaks as boundary points. Map the spectral signatures of the segmented audio to the closest spectral features of Tamil phonetic sounds.
+7. **Phonetic Sound Display**: Convert the mapped spectral features into Tamil characters to display the corresponding phonetic sounds.
+
 
 ## File Description
 |File Name|Description|
