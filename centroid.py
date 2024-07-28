@@ -3,7 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 from peaks import peak_finding
+from phonetic_spectrogram import compute_spectrogram_and_find_peaks
 import math
+import os
+from dotenv import load_dotenv
+import json
 
 
 def plot_centroid(centroid, frame):
@@ -76,12 +80,38 @@ def process_no_frame(path):  # no frame division
     prev_x = 0
     prev_y = 0
     S = librosa.amplitude_to_db(np.abs(s), ref=np.max)
+
+    with open('tamil_phonetic.json') as f:
+        tamil_phonetics = json.load(f)
+
     for (x, y, I) in peaks_sorted:
         x = int(x)
         y = int(y)
 
         region = S[prev_x:x+1, prev_y:y+1]
         region = np.matrix.flatten(region)
+
+        # compute spectrogram for phonetics
+        distances = list()
+        keys = list()
+        for key in tamil_phonetics.keys():
+            file_name = tamil_phonetics[key][1]
+            path = os.path.join(os.getenv("phonetics"), file_name+"audio.m4a")
+
+            # get spectrogram
+            spec = compute_spectrogram_and_find_peaks(path)
+            spec = np.matrix.flatten(spec)
+
+            # similarity
+            d = np.abs(np.mean(region)-np.mean(spec))
+
+            keys.append(key)
+            distances.append(d)
+
+        minpos = distances.index(min(distances))
+        phonetic = keys[minpos-1]
+
+        print(phonetic, end=" ")
 
         prev_x = x
         prev_y = y
@@ -131,5 +161,6 @@ def process(path):
 
 
 if __name__ == '__main__':
+    load_dotenv('.env')
     process_no_frame(
         "/Volumes/Vault/Smudge/Datasets/Tamil/Wav-Audios/1audio.wav")
